@@ -429,6 +429,20 @@
       opacity: 0.55;
     }
 
+    /* Nút mời tạo thiệp riêng */
+    .make-own {
+      margin-top: 6px;
+      padding: 10px 22px;
+      border-radius: 30px;
+      background: rgba(255, 255, 255, 0.35);
+      border: 1.5px solid rgba(255, 255, 255, 0.85);
+      color: #9c1039;
+      font-size: 1rem;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 6px 18px rgba(255, 105, 135, 0.3);
+    }
+
     /* Hiệu ứng tim bay */
     .heart {
       position: fixed;
@@ -516,9 +530,12 @@
         </div>
       </div>
 
+      <a class="make-own" href="tao.html">💝 Tạo thiệp của riêng bạn</a>
+
     </div>
   </div>
 
+  <script src="config.js"></script>
   <script>
     // --- 1. CHUYỂN CẢNH KHI NHẤN "SẴN SÀNG" ---
     function enterExperience() {
@@ -541,31 +558,50 @@
     }
 
     // --- 0. NỘI DUNG RIÊNG CHO TỪNG NGƯỜI ---
-    // Link dạng  .../?k=lan-x8p3  sẽ đọc ảnh + lời nhắn trong  khach/lan-x8p3/info.json
-    // Link không có ?k=... thì dùng nội dung mặc định viết sẵn trong file này.
-    async function loadPerson() {
-      const k = new URLSearchParams(location.search).get("k");
-      if (!k) return;
-      if (!/^[a-z0-9-]+$/.test(k)) return showMissing();
+    // Link dạng  .../?k=lan-x8p3   sẽ đọc ảnh + lời nhắn trong  khach/lan-x8p3/info.json
+    // Link dạng  .../?id=lan-x8p3  là thiệp người dùng tự tạo ở trang tao.html (lưu trên Cloudinary)
+    // Link không có ?k= / ?id= thì dùng nội dung mặc định viết sẵn trong file này.
+    const CFG = window.THIEP_CONFIG || {};
+    const CLOUD_URL = /^https:\/\/res\.cloudinary\.com\//;
 
-      const base = "khach/" + k + "/";
+    async function loadPerson() {
+      const params = new URLSearchParams(location.search);
+      const k = params.get("k");
+      const id = params.get("id");
+
+      let base, infoUrl;
+      if (id) {
+        if (!CFG.cloudName || !/^[A-Za-z0-9_\/-]+$/.test(id)) return showMissing();
+        base = "";
+        infoUrl = "https://res.cloudinary.com/" + CFG.cloudName + "/raw/upload/" + id;
+      } else if (k) {
+        if (!/^[a-z0-9-]+$/.test(k)) return showMissing();
+        base = "khach/" + k + "/";
+        infoUrl = base + "info.json";
+      } else {
+        return;
+      }
+
       let info;
       try {
-        const res = await fetch(base + "info.json", { cache: "no-cache" });
+        const res = await fetch(infoUrl, { cache: "no-cache" });
         if (!res.ok) throw 0;
         info = await res.json();
       } catch (e) {
         return showMissing();
       }
 
-      if (info.anh && info.anh.length) photoList = info.anh.map(f => base + f);
+      // Ảnh: link Cloudinary dùng nguyên, tên file thì ghép với thư mục khach/...
+      const photoSrc = f => CLOUD_URL.test(f) ? f : (base && /^[\w.-]+$/.test(f) ? base + f : null);
+      const photos = (info.anh || []).map(photoSrc).filter(Boolean);
+      if (photos.length) photoList = photos;
       if (info.loi_chao) {
         document.getElementById("banner").textContent = info.loi_chao;
         document.title = info.loi_chao.replace(/✨/g, "").trim();
       }
       if (info.tieu_de) document.getElementById("headerTitle").textContent = info.tieu_de;
-      if (info.nhac) {
-        document.getElementById("audio").src = "music/" + info.nhac;
+      if (info.nhac && (CLOUD_URL.test(info.nhac) || !/[\/\\]/.test(info.nhac))) {
+        document.getElementById("audio").src = CLOUD_URL.test(info.nhac) ? info.nhac : "music/" + info.nhac;
         document.getElementById("trackTitle").textContent = info.ten_bai || info.nhac.replace(/\.mp3$/i, "");
       }
       if (info.loi_nhan && info.loi_nhan.length) {
@@ -609,7 +645,10 @@
         if (index !== currentMainIndex) {
           const div = document.createElement("div");
           div.className = "side-item";
-          div.innerHTML = `<img src="${src}" alt="Sub Photo">`;
+          const img = document.createElement("img");
+          img.src = src;
+          img.alt = "Sub Photo";
+          div.appendChild(img);
           div.onclick = () => {
             switchPhoto(index);
             resetAutoSlide();
