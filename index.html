@@ -571,7 +571,8 @@
 
       let base, infoUrl;
       if (id) {
-        if (!CFG.cloudName || !/^[A-Za-z0-9_\/-]+$/.test(id)) return showMissing();
+        // Cloudinary tự thêm đuôi file vào mã (VD "chi-lan-x8p3k2.json") nên cho phép dấu chấm, trừ ".."
+        if (!CFG.cloudName || !/^[A-Za-z0-9_.\/-]+$/.test(id) || id.includes("..")) return showMissing();
         base = "";
         infoUrl = "https://res.cloudinary.com/" + CFG.cloudName + "/raw/upload/" + id;
       } else if (k) {
