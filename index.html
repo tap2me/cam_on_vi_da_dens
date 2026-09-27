@@ -429,20 +429,6 @@
       opacity: 0.55;
     }
 
-    /* Nút mời tạo thiệp riêng */
-    .make-own {
-      margin-top: 6px;
-      padding: 10px 22px;
-      border-radius: 30px;
-      background: rgba(255, 255, 255, 0.35);
-      border: 1.5px solid rgba(255, 255, 255, 0.85);
-      color: #9c1039;
-      font-size: 1rem;
-      font-weight: 700;
-      text-decoration: none;
-      box-shadow: 0 6px 18px rgba(255, 105, 135, 0.3);
-    }
-
     /* Hiệu ứng tim bay */
     .heart {
       position: fixed;
@@ -530,8 +516,6 @@
         </div>
       </div>
 
-      <a class="make-own" href="tao.html">💝 Tạo thiệp của riêng bạn</a>
-
     </div>
   </div>
 
@@ -559,7 +543,7 @@
 
     // --- 0. NỘI DUNG RIÊNG CHO TỪNG NGƯỜI ---
     // Link dạng  .../?k=lan-x8p3   sẽ đọc ảnh + lời nhắn trong  khach/lan-x8p3/info.json
-    // Link dạng  .../?id=lan-x8p3  là thiệp người dùng tự tạo ở trang tao.html (lưu trên Cloudinary)
+    // Link dạng  .../?id=lan-x8p3  là thiệp chủ web tạo bằng công cụ tao-thiep.html (lưu trên Cloudinary)
     // Link không có ?k= / ?id= thì dùng nội dung mặc định viết sẵn trong file này.
     const CFG = window.THIEP_CONFIG || {};
     const CLOUD_URL = /^https:\/\/res\.cloudinary\.com\//;

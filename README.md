@@ -1,7 +1,8 @@
 # 💌 Cảm ơn vì đã đến
 
-Trang thiệp cảm ơn có ảnh kỷ niệm, nhạc nền và lời nhắn. **Ai cũng có thể tự tạo thiệp riêng**:
-vào trang `tao.html`, tải ảnh lên, viết lời nhắn, rồi nhận một đường link riêng để gửi cho người khác.
+Trang thiệp cảm ơn có ảnh kỷ niệm, nhạc nền và lời nhắn. Chủ web tạo thiệp cho từng khách
+bằng một công cụ trên máy mình, rồi gửi mỗi khách **một đường link riêng**. Khách chỉ xem được
+thiệp của mình, không tự tạo được thiệp mới.
 
 ## Các loại link
 
@@ -9,30 +10,33 @@ vào trang `tao.html`, tải ảnh lên, viết lời nhắn, rồi nhận một
 |---|---|
 | `.../` | Nội dung mặc định viết sẵn trong `index.html` + ảnh trong `images/` |
 | `.../?k=lannew1-udju` | Thư mục `khach/lannew1-udju/` (tự tay thêm vào code như trước) |
-| `.../?id=chi-lan-x8p3k2` | Thiệp người dùng tự tạo ở `tao.html` (ảnh lưu trên Cloudinary) |
-| `.../tao.html` | Trang để người dùng tự tạo thiệp |
+| `.../?id=chi-lan-x8p3k2.json` | Thiệp tạo bằng công cụ `tao-thiep.html` (ảnh lưu trên Cloudinary) |
 
-## Cài đặt một lần (khoảng 5 phút)
+## Tạo thiệp cho khách
 
-Trang web này là web tĩnh, không có máy chủ riêng, nên ảnh người dùng tải lên được lưu ở
-**Cloudinary** (gói miễn phí, không cần thẻ ngân hàng).
+Công cụ nằm ở thư mục **`CONG-CU-TAO-THIEP (khong dua len web)`**, bên ngoài thư mục web này.
 
-1. Đăng ký tài khoản miễn phí tại <https://cloudinary.com>.
-2. Vào **Dashboard** rồi chép **Cloud name** (ví dụ `dxyz12abc`).
-3. Vào **Settings** (bánh răng) → **Upload** → mục **Upload presets** → **Add upload preset**:
-   - **Signing mode**: chọn **Unsigned**
-   - Đặt tên preset, ví dụ `thiep_unsigned`, rồi bấm **Save**
-4. Mở file `config.js` rồi điền hai giá trị vừa lấy:
-   ```js
-   cloudName: "dxyz12abc",
-   uploadPreset: "thiep_unsigned",
-   ```
-5. Đưa code lên chỗ đang đăng trang (GitHub Pages, Netlify…) như bình thường.
-6. Thử: vào `.../tao.html`, tạo một thiệp, rồi mở link nhận được.
+1. Nhấp đúp vào `tao-thiep.html` (mở bằng Chrome hoặc Edge; máy cần có internet, nhưng không cần đưa file lên web).
+2. Nhập tên khách, thêm ảnh, viết lời nhắn, chọn nhạc rồi bấm **Tạo link 💖**.
+3. Sao chép link và gửi cho khách.
 
-## Thêm bài hát để người dùng chọn
+Các link đã tạo được lưu ở mục **"Thiệp đã tạo trên máy này"** ngay trong công cụ.
+Danh sách này chỉ có trên trình duyệt của máy đó, nên nhớ lưu link ra chỗ khác nếu quan trọng.
 
-Chép file `.mp3` vào thư mục `music/`, rồi thêm một dòng trong `config.js`:
+⚠️ **Không đưa `tao-thiep.html` lên GitHub.** Trong file có tên upload preset. Ai biết tên
+preset là tải được file lên tài khoản Cloudinary của bạn.
+
+## Cài đặt Cloudinary (đã làm xong, ghi lại để nhớ)
+
+1. Tài khoản Cloudinary → **Dashboard** → chép **Cloud name**, điền vào `config.js` của web
+   **và** phần CÀI ĐẶT ở đầu file `tao-thiep.html`.
+2. **Settings** → **Upload** → **Upload presets** → **Add upload preset** → Signing mode **Unsigned**.
+   Đặt tên khó đoán (ví dụ `thiep-k7x2p9qm`), rồi điền tên đó **chỉ** vào `tao-thiep.html`.
+
+## Thêm bài hát để chọn
+
+Chép file `.mp3` vào thư mục `music/` của web (và đưa lên GitHub), rồi thêm một dòng vào
+`songs` trong phần CÀI ĐẶT của `tao-thiep.html`:
 
 ```js
 songs: [
@@ -41,17 +45,12 @@ songs: [
 ],
 ```
 
-Người dùng cũng có thể tự tải bài `.mp3` của họ lên (tối đa 15MB, chỉnh được bằng `maxSongMB`).
+Cũng có thể chọn "Tải bài hát của bạn" trong công cụ để tải thẳng một file `.mp3` lên Cloudinary.
 
 ## Lưu ý
 
-- **Ảnh được thu nhỏ trước khi tải lên** (cạnh dài nhất 1600px), nên tải nhanh và tốn ít dung lượng.
-  Gói miễn phí của Cloudinary đủ cho hàng nghìn thiệp.
-- **Ai có link thì xem được thiệp.** Mã link có đuôi ngẫu nhiên nên người khác không đoán ra được,
-  nhưng đừng tải lên ảnh quá riêng tư.
-- **Upload preset kiểu "Unsigned" nghĩa là ai mở trang cũng tải được file lên tài khoản Cloudinary này.**
-  Với trang nhỏ thì không sao. Nếu thấy có file lạ, vào Cloudinary → **Media Library** để xoá.
+- **Ai có link thì xem được thiệp.** Mã link có đuôi ngẫu nhiên nên người khác không đoán ra được.
 - **Xoá một thiệp:** vào Cloudinary → Media Library, tìm file có tên giống mã trong link
   (ví dụ `chi-lan-x8p3k2`) và các ảnh của thiệp đó rồi xoá.
-- **Link báo "Không tìm thấy lời nhắn này":** kiểm tra lại `cloudName` trong `config.js`, và xem file
+- **Link báo "Không tìm thấy lời nhắn này":** kiểm tra `cloudName` trong `config.js`, và xem file
   đó còn trong Media Library không.
